@@ -1,8 +1,6 @@
 /**
- * Module to detect date and time information from text
- *
- * mon tue wed
- * date format parsing
+ * Module to detect date and time information from text together with some
+ * additional information defined in the parser rules.
  *
  */
 
