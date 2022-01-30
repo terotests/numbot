@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/terotests/numbot.git"
   },
-  "author": "",
+  "author": "Tero Tolonen",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/terotests/numbot/issues"
