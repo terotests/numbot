@@ -1,8 +1,8 @@
 {
   "name": "numbot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parser for text based logs",
-  "main": "index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "tsc": "tsc",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
