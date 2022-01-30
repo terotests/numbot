@@ -113,7 +113,7 @@ describe("Options tests", () => {
       }
     });
 
-    console.log(test);
+    console.log(JSON.stringify(test, null, 2));
   });
 
   it("Test text and number parsing", () => {
