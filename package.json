@@ -1,5 +1,5 @@
 {
-  "name": "textlogparser",
+  "name": "numbot",
   "version": "1.0.0",
   "description": "Parser for text based logs",
   "main": "index.js",

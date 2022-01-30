@@ -37,25 +37,29 @@ export function parseLine(
   const findMatch = (input: string) => {
     let str = input;
     let didFind = false;
-    rules.matchers.forEach((m) => {
-      if (didFind) {
-        return;
-      }
-      const match = m.exec(str);
-      if (match && match.index === 0 && match[0].length > 0) {
-        if (match.groups?.text) {
-          if (!result.text) {
-            result.text = [];
-          }
-          result.text.push(match.groups.text);
-        } else {
-          result = { ...result, ...match.groups };
-        }
+    let longestMatch = 0;
+    let actionFn: () => void = () => {};
 
-        testableString = str.slice(match[0].length).trim();
+    // find the longest matching sequence
+    rules.matchers.forEach((m) => {
+      const match = m.exec(str);
+      if (match && match.index === 0 && match[0].length > longestMatch) {
+        actionFn = () => {
+          if (match.groups?.text) {
+            if (!result.text) {
+              result.text = [];
+            }
+            result.text.push(match.groups.text);
+          } else {
+            result = { ...result, ...match.groups };
+          }
+          testableString = str.slice(match[0].length).trim();
+        };
+        longestMatch = match[0].length;
         didFind = true;
       }
     });
+    actionFn();
     return didFind;
   };
 
@@ -83,9 +87,12 @@ export function parseLines(
   startDate?: Date
 ) {
   let currentDate = createNewDay(startDate);
-  return input.split("\n").map((line) => {
-    const res = parseLine(rules, line, new Date(currentDate));
-    currentDate = res.day!;
-    return res;
-  });
+  return input
+    .split("\n")
+    .filter((s) => s.trim())
+    .map((line) => {
+      const res = parseLine(rules, line, new Date(currentDate));
+      currentDate = res.day!;
+      return res;
+    });
 }

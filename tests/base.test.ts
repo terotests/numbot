@@ -36,6 +36,22 @@ describe("Options tests", () => {
     });
   });
 
+  it("Test month: march", () => {
+    const test = parser("maaliskuu", exampleRules, new Date("2022-01-30"));
+    expect(test.length).to.eq(1);
+    test.forEach((row) => {
+      expect(row.day.getMonth()).to.eq(2);
+    });
+  });
+
+  it("Test month: Mar", () => {
+    const test = parser("Mar", exampleRules, new Date("2022-01-30"));
+    expect(test.length).to.eq(1);
+    test.forEach((row) => {
+      expect(row.day.getMonth()).to.eq(2);
+    });
+  });
+
   it("Test last week, text and numbers", () => {
     const test = parser(
       `viime viikko ti projekti sairas 7.5`,
@@ -77,6 +93,27 @@ describe("Options tests", () => {
         expect(row.result?.text?.[0]).to.eq("juoksu");
       }
     });
+  });
+
+  it("Test multiline with english week", () => {
+    const test = parser(
+      `
+  Year 2021 
+  Week 1
+    Mon running 45min 
+      `,
+      exampleRules,
+      new Date("2022-01-30")
+    );
+    test.forEach((row) => {
+      if (row.result.duration_mins) {
+        expect(row.day.getDate()).to.eq(4);
+        expect(row.result.duration_mins).to.eq("45");
+        expect(row.result?.text?.[0]).to.eq("running");
+      }
+    });
+
+    console.log(test);
   });
 
   it("Test text and number parsing", () => {

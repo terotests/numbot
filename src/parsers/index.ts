@@ -30,22 +30,24 @@ export const exampleRules: Parser = {
     /(?<day>\d{1,2})\.(?<month>\d{1,2})\./u,
 
     // day names
-    /(?<monday>ma|maanantai|mon)/u,
-    /(?<tuesday>ti|tiistai|tue)/u,
-    /(?<wednesday>ke|keskiviikko|wed)/u,
-    /(?<thursday>to|torstai|thu)/u,
-    /(?<friday>pe|perjantai|fri)/u,
-    /(?<saturday>la|lauantai|sat)/u,
-    /(?<sunday>su|sunnuntai|sun)/u,
+    /(?<monday>ma|maanantai|mon)/iu,
+    /(?<tuesday>ti|tiistai|tue)/iu,
+    /(?<wednesday>ke|keskiviikko|wed)/iu,
+    /(?<thursday>to|torstai|thu)/iu,
+    /(?<friday>pe|perjantai|fri)/iu,
+    /(?<saturday>la|lauantai|sat)/iu,
+    /(?<sunday>su|sunnuntai|sun)/iu,
 
     // special fraces
     /(?<last_week>viime viikko)/u,
     /(?<last_week>last week)/u,
 
     // moving date
-    /viikko\s*(?<move_week>[+-][0-9]+)/u,
-    /viikko\s*(?<move_to_week>[0-9]+)/u,
-    /vuosi\s*(?<move_to_year>[0-9]+)/u,
+    /viikko\s*(?<move_week>[+-][0-9]+)/iu,
+    /viikko\s*(?<move_to_week>[0-9]+)/iu,
+    /week\s*(?<move_to_week>[0-9]+)/iu,
+    /vuosi\s*(?<move_to_year>[0-9]+)/iu,
+    /year\s*(?<move_to_year>[0-9]+)/iu,
 
     // date of month
     /(?<day>\d{1,2})th/u,
@@ -60,6 +62,11 @@ export const exampleRules: Parser = {
     /(?<friday>pe|perjantai)/u,
     /(?<saturday>la|lauantai)/u,
     /(?<sunday>su|sunnuntai)/u,
+
+    // month names
+    /(?<january>jan|january|tammikuu)/iu,
+    /(?<february>feb|february|helmikuu)/iu,
+    /(?<march>mar|march|maaliskuu)/iu,
 
     // time of day
     /(?<hour>\d{1,2}):(?<minutes>\d{1,2})/u,
@@ -161,6 +168,15 @@ export const exampleRules: Parser = {
     },
     {
       sunday: (y, v) => setWeekDay(y, 7),
+    },
+    {
+      january: (y, v) => (y.setMonth(0), y),
+    },
+    {
+      february: (y, v) => (y.setMonth(1), y),
+    },
+    {
+      march: (y, v) => (y.setMonth(2), y),
     },
   ],
 };
