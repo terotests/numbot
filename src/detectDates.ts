@@ -20,21 +20,46 @@
 
 import * as dfns from "date-fns";
 
+import * as locale from "date-fns/locale";
+
+console.log("Locales ", locale.fi);
+
+const settings = {
+  weekStartsOn: 1,
+};
+
 // matcher
 
 // correct order of the matchers is very important here
 const matchers: RegExp[] = [
   // date numbers
   /(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})/u,
-  /(?<day>\d{1,2})\.(?<month>\d{1,2})/u,
   /(?<day>\d{1,2})\.(?<month>\d{1,2})\.(?<year>\d{4})/u,
-
-  // time of day
-  /(?<hour>\d{1,2}):(?<minutes>\d{1,2})/u,
-  /kello (?<hour>\d{1,2}):(?<minutes>\d{1,2})/u,
-  /kello (?<hour>\d{1,2})/u,
+  /(?<day>\d{1,2})\.(?<month>\d{1,2})\./u,
 
   // day names
+  /(?<monday>ma|maanantai|mon)/u,
+  /(?<tuesday>ti|tiistai|tue)/u,
+  /(?<wednesday>ke|keskiviikko|wed)/u,
+  /(?<thursday>to|torstai|thu)/u,
+  /(?<friday>pe|perjantai|fri)/u,
+  /(?<saturday>la|lauantai|sat)/u,
+  /(?<sunday>su|sunnuntai|sun)/u,
+
+  // special fraces
+  /(?<last_week>viime viikko)/u,
+  /(?<last_week>last week)/u,
+
+  // moving date
+  /viikko\s*(?<move_week>[+-][0-9]+)/u,
+  /viikko\s*(?<move_to_week>[0-9]+)/u,
+
+  // date of month
+  /(?<day>\d{1,2})th/u,
+  /(?<day>\d{1})st/u,
+  /(?<day>\d{1})nd/u,
+
+  // week days
   /(?<monday>ma|maanantai)/u,
   /(?<tuesday>ti|tiistai)/u,
   /(?<wednesday>ke|keskiviikko)/u,
@@ -43,20 +68,46 @@ const matchers: RegExp[] = [
   /(?<saturday>la|lauantai)/u,
   /(?<sunday>su|sunnuntai)/u,
 
+  // time of day
+  /(?<hour>\d{1,2}):(?<minutes>\d{1,2})/u,
+
   // lisää matchereitä, esim. tunteja yms.
-  /(?<h>\d{1,2})h/u,
-  /(?<h>\d{1,2}.\d{1})h/u,
+  /(?<duration_hours>\d{1,2})h/u,
+  /(?<duration_hours>\d{1,2}.\d{1})h/u,
+  /(?<duration_mins>\d{1,2})min/u,
+  /(?<duration_mins>\d{1,2}\.\d{1})min/u,
+
+  // suureiden tunnistamista
+  /(?<kcal>\d+)\s*kcal/u,
+
+  // project and scope
+  /(?<scope>[a-zA-ZöäåÖÄÅ]+)\.(?<project>[a-zA-ZöäåÖÄÅ]+)/u,
+
+  // text
+  /(?<text>[a-zA-ZöäåÖÄÅ]+)/u,
+
+  // any number
+  /(?<number>[0-9]*[.]?[0-9]+)/u,
+  /(?<number>\d+)/u,
 ];
 
 const setWeekDay = (y: Date, weekDayNo: number) => {
-  const currentDay = y.getDay();
+  let currentDay = y.getDay();
+  if (currentDay < settings.weekStartsOn) {
+    currentDay = 7 - currentDay;
+  }
   const distance = weekDayNo - currentDay;
   y.setDate(y.getDate() + distance);
   return y;
 };
 
 const travellers: Array<{
-  [key: string]: (startDate: Date, value: string) => Date;
+  [key: string]: (
+    startDate: Date,
+    value: string,
+    obj: any,
+    key: string
+  ) => Date;
 }> = [
   {
     year: (y, v) => {
@@ -75,7 +126,7 @@ const travellers: Array<{
   {
     day: (y, v) => {
       console.log("Setting day to ", v);
-      y.setDate(Number(v) - 1);
+      y.setDate(Number(v));
       return y;
     },
   },
@@ -94,6 +145,27 @@ const travellers: Array<{
     },
   },
   {
+    last_week: (y, v) => {
+      console.log("viime viikko", v);
+      y.setDate(y.getDate() - 7);
+      return y;
+    },
+  },
+  {
+    move_week: (y, v) => {
+      console.log("siirrä viikkoa", v);
+      y.setDate(y.getDate() + 7 * Number(v));
+      return y;
+    },
+  },
+  {
+    move_to_week: (y, v) => {
+      const delta = Number(v) - dfns.getWeek(y, { locale: locale.fi });
+      y.setDate(y.getDate() + 7 * delta);
+      return y;
+    },
+  },
+  {
     monday: (y, v) => setWeekDay(y, 1),
   },
   {
@@ -104,30 +176,12 @@ const travellers: Array<{
   },
 ];
 
-// scope function matcher
-const scopeMatcher = {
-  week: (d: Date, amount: number) => {
-    return dfns.addWeeks(d, amount);
-  },
-  month: (d: Date, amount: number) => {
-    return dfns.addMonths(d, amount);
-  },
-};
-
-// convert known word to amoung
-const amountMathcer = {
-  last: -1,
-};
-
-const languageDefinitions = {
-  eilen: (d: Date) => {},
-};
-
-export function parseTimeInformation(inputString: string, datePointer?: Date) {}
-
-export function test(stringToTest: string = "ke") {
+export function test(input: string, pvm = new Date()) {
   let result: any = {};
 
+  const stringToTest = input.trim();
+
+  console.log("STR: ", stringToTest);
   // cut the values
 
   let testableString = stringToTest;
@@ -139,15 +193,25 @@ export function test(stringToTest: string = "ke") {
         return;
       }
       const match = m.exec(str);
-      if (match && match.index === 0) {
-        result = { ...result, ...match.groups };
+      if (match && match.index === 0 && match[0].length > 0) {
+        if (match.groups?.text) {
+          if (!result.text) {
+            result.text = [];
+          }
+          result.text.push(match.groups.text);
+        } else {
+          result = { ...result, ...match.groups };
+        }
+
         testableString = str.slice(match[0].length).trim();
         didFind = true;
       }
     });
     return didFind;
   };
+
   while (findMatch(testableString));
+
   /*
   matchers.forEach((m) => {
     console.log(".. ", str);
@@ -162,20 +226,36 @@ export function test(stringToTest: string = "ke") {
   });
 */
 
-  let day = new Date();
+  let day = (() => {
+    if (pvm) return pvm;
+    const day = new Date();
 
-  day.setHours(8);
-  day.setSeconds(0);
-  day.setMinutes(0);
-  day.setMilliseconds(0);
+    day.setHours(8);
+    day.setSeconds(0);
+    day.setMinutes(0);
+    day.setMilliseconds(0);
+    return day;
+  })();
 
   travellers.forEach((t) => {
     Object.keys(result).forEach((key) => {
       if (t[key]) {
-        day = t[key](day, result[key]);
+        day = t[key](day, result[key], result, key);
       }
     });
   });
 
-  return day;
+  return {
+    day,
+    result,
+  };
+}
+
+export function parseLines(input: string) {
+  let currentDate = new Date();
+  return input.split("\n").map((line) => {
+    const res = test(line, new Date(currentDate));
+    currentDate = res.day!;
+    return res;
+  });
 }
