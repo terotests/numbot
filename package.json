@@ -1,12 +1,11 @@
 {
-  "name": "numbot",
+  "name": "textlogparser",
   "version": "1.0.0",
-  "description": "Number parsing bot",
+  "description": "Parser for text based logs",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "test": "npm run tsc && node dist/src/index.js",
-    "test2": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "repository": {
     "type": "git",
