@@ -1,14 +1,4 @@
 import * as dfns from "date-fns";
-import * as locale from "date-fns/locale";
-
-const setWeekDay = (y: Date, weekDayNo: number) => {
-  const startOfWeek = dfns.startOfWeek(y, { locale: locale.fi });
-  const day = dfns.addDays(startOfWeek, weekDayNo - 1);
-  // do not lose the time information
-  day.setHours(y.getHours());
-  day.setMinutes(y.getMinutes());
-  return day;
-};
 
 export type Parser = {
   matchers: RegExp[];
@@ -94,89 +84,61 @@ export const exampleRules: Parser = {
   ],
   transformers: [
     {
-      year: (y, v) => {
-        y.setFullYear(Number(v));
-        return y;
-      },
+      year: (y, v) => dfns.setYear(y, Number(v)),
     },
     {
-      day: (y, v) => {
-        y.setDate(Number(v));
-        return y;
-      },
+      day: (y, v) => dfns.setDay(y, Number(v)),
     },
     {
-      month: (y, v) => {
-        y.setMonth(Number(v) - 1);
-        return y;
-      },
+      month: (y, v) => dfns.setMonth(y, Number(v) - 1),
     },
     {
-      hour: (y, v) => {
-        y.setHours(Number(v));
-        return y;
-      },
+      hour: (y, v) => dfns.setHours(y, Number(v)),
     },
     {
-      minutes: (y, v) => {
-        y.setMinutes(Number(v));
-        return y;
-      },
+      minutes: (y, v) => dfns.setMinutes(y, Number(v)),
     },
     {
-      last_week: (y, v) => {
-        y.setDate(y.getDate() - 7);
-        return y;
-      },
+      last_week: (y, v) => dfns.addDays(y, -7),
     },
     {
-      move_week: (y, v) => {
-        y.setDate(y.getDate() + 7 * Number(v));
-        return y;
-      },
+      move_week: (y, v) => dfns.addWeeks(y, Number(v)),
     },
     {
-      move_to_year: (y, v) => {
-        y.setFullYear(Number(v));
-        return y;
-      },
+      move_to_year: (y, v) => dfns.setYear(y, Number(v)),
     },
     {
-      move_to_week: (y, v) => {
-        const delta = Number(v) - dfns.getWeek(y, { locale: locale.fi });
-        y.setDate(y.getDate() + 7 * delta);
-        return y;
-      },
+      move_to_week: (y, v) => dfns.setISOWeek(y, Number(v)),
     },
     {
-      monday: (y, v) => setWeekDay(y, 1),
+      monday: (y, v) => dfns.setISODay(y, 1),
     },
     {
-      tuesday: (y, v) => setWeekDay(y, 2),
+      tuesday: (y, v) => dfns.setISODay(y, 2),
     },
     {
-      wednesday: (y, v) => setWeekDay(y, 3),
+      wednesday: (y, v) => dfns.setISODay(y, 3),
     },
     {
-      thursday: (y, v) => setWeekDay(y, 4),
+      thursday: (y, v) => dfns.setISODay(y, 4),
     },
     {
-      friday: (y, v) => setWeekDay(y, 5),
+      friday: (y, v) => dfns.setISODay(y, 5),
     },
     {
-      saturday: (y, v) => setWeekDay(y, 6),
+      saturday: (y, v) => dfns.setISODay(y, 6),
     },
     {
-      sunday: (y, v) => setWeekDay(y, 7),
+      sunday: (y, v) => dfns.setISODay(y, 7),
     },
     {
-      january: (y, v) => (y.setMonth(0), y),
+      january: (y, v) => dfns.setMonth(y, 0),
     },
     {
-      february: (y, v) => (y.setMonth(1), y),
+      february: (y, v) => dfns.setMonth(y, 1),
     },
     {
-      march: (y, v) => (y.setMonth(2), y),
+      march: (y, v) => dfns.setMonth(y, 2),
     },
   ],
 };
