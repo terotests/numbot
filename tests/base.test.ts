@@ -122,6 +122,72 @@ describe("Options tests", () => {
     });
   });
 
+  it("Test Finnish month names (tammikuu, helmikuu...)", () => {
+    [
+      "tammikuu",
+      "helmikuu",
+      "maaliskuu",
+      "huhtikuu",
+      "toukokuu",
+      "kesäkuu",
+      "heinäkuu",
+      "elokuu",
+      "syyskuu",
+      "lokakuu",
+      "marraskuu",
+      "joulukuu",
+    ].forEach((name, idx) => {
+      const test = parser(name);
+      test.forEach((row) => {
+        expect(row.day.getMonth()).to.eq(idx);
+      });
+    });
+  });
+
+  it("Test English month names (january, february...)", () => {
+    [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ].forEach((name, idx) => {
+      const test = parser(name);
+      test.forEach((row) => {
+        expect(row.day.getMonth()).to.eq(idx);
+      });
+    });
+  });
+
+  it("Test English month names, short versions (jan, feb,...)", () => {
+    [
+      "jan",
+      "feb",
+      "mar",
+      "apr",
+      "may",
+      "jun",
+      "jul",
+      "aug",
+      "sep",
+      "oct",
+      "nov",
+      "dec",
+    ].forEach((name, idx) => {
+      const test = parser(name);
+      test.forEach((row) => {
+        expect(row.day.getMonth()).to.eq(idx);
+      });
+    });
+  });
+
   it("Test multiline with several weeks", () => {
     const test = parser(
       `

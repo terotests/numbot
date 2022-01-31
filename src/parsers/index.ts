@@ -53,10 +53,19 @@ export const exampleRules: Parser = {
     /(?<saturday>la|lauantai)/u,
     /(?<sunday>su|sunnuntai)/u,
 
-    // month names
-    /(?<january>jan|january|tammikuu)/iu,
-    /(?<february>feb|february|helmikuu)/iu,
-    /(?<march>mar|march|maaliskuu)/iu,
+    // month names, notice: longer name must come before shorthand
+    /(?<january>january|jan|tammikuu)/iu,
+    /(?<february>february|feb|helmikuu)/iu,
+    /(?<march>march|mar|maaliskuu)/iu,
+    /(?<april>april|apr|huhtikuu)/iu,
+    /(?<may>may|toukokuu)/iu,
+    /(?<june>june|jun|kesäkuu)/iu,
+    /(?<july>july|jul|heinäkuu)/iu,
+    /(?<august>august|aug|elokuu)/iu,
+    /(?<september>september|sep|syyskuu)/iu,
+    /(?<october>october|oct|lokakuu)/iu,
+    /(?<november>november|nov|marraskuu)/iu,
+    /(?<december>december|dec|joulukuu)/iu,
 
     // time of day
     /(?<hour>\d{1,2}):(?<minutes>\d{1,2})/u,
@@ -139,6 +148,33 @@ export const exampleRules: Parser = {
     },
     {
       march: (y, v) => dfns.setMonth(y, 2),
+    },
+    {
+      april: (y, v) => dfns.setMonth(y, 3),
+    },
+    {
+      may: (y, v) => dfns.setMonth(y, 4),
+    },
+    {
+      june: (y, v) => dfns.setMonth(y, 5),
+    },
+    {
+      july: (y, v) => dfns.setMonth(y, 6),
+    },
+    {
+      august: (y, v) => dfns.setMonth(y, 7),
+    },
+    {
+      september: (y, v) => dfns.setMonth(y, 8),
+    },
+    {
+      october: (y, v) => dfns.setMonth(y, 9),
+    },
+    {
+      november: (y, v) => dfns.setMonth(y, 10),
+    },
+    {
+      december: (y, v) => dfns.setMonth(y, 11),
     },
   ],
 };

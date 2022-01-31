@@ -41,6 +41,7 @@ export function parseLine(
     // find the longest matching sequence
     rules.matchers.forEach((m) => {
       const match = m.exec(str);
+
       if (match && match.index === 0 && match[0].length > longestMatch) {
         actionFn = () => {
           if (match.groups?.text) {
