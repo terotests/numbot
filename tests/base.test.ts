@@ -112,8 +112,6 @@ describe("Options tests", () => {
         expect(row.result?.text?.[0]).to.eq("running");
       }
     });
-
-    console.log(JSON.stringify(test, null, 2));
   });
 
   it("Test text and number parsing", () => {
