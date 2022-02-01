@@ -225,11 +225,11 @@ describe("Options tests", () => {
     ke kävely 50min
   viikko 2
     ma juoksu 15min
-    ti juoksu 30min    
-    ke sali 40min
+    ti juoksu 30min 
   viikko 3
     ma juoksu 44min
     ti juoksu 44min
+    ke kävely 10min
     to juoksu 44min
   viikko 4
     ma juoksu 34min
@@ -238,7 +238,9 @@ describe("Options tests", () => {
   viikko 5
     ma juoksu 44min
     ti juoksu 34min
+    ke kävely 10min
     to juoksu 14min
+    su kävely 20min
 
 
     `,
@@ -248,7 +250,7 @@ describe("Options tests", () => {
     const statistics = stats(test, "juoksu", "duration_mins");
     console.log(
       babar(statistics.week.sum, {
-        caption: "weekly sum",
+        caption: "running weekly sum",
         color: "green",
         width: 40,
         height: 10,
@@ -259,8 +261,20 @@ describe("Options tests", () => {
 
     console.log(
       babar(statistics.week.avg, {
-        caption: "weekly average",
+        caption: "running weekly average",
         color: "green",
+        width: 40,
+        height: 10,
+        minY: 0.01,
+        yFractions: 1,
+      })
+    );
+
+    const walk_stats = stats(test, "kävely", "duration_mins");
+    console.log(
+      babar(walk_stats.week.sum, {
+        caption: "walking weekly sum",
+        color: "blue",
         width: 40,
         height: 10,
         minY: 0.01,

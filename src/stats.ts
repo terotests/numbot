@@ -16,7 +16,7 @@ function computeStats(vals: number[]) {
   return {
     count: vals.length,
     sum,
-    avg: sum / vals.length,
+    avg: vals.length > 0 ? sum / vals.length : 0,
     min: Math.min.apply(Math, vals),
     max: Math.max.apply(Math, vals),
   };
@@ -56,11 +56,26 @@ export function getStatsFor(
   );
 
   const collect = (part: string, aggregateName: AggregateKey) => {
-    return Object.entries(aggregatedData[part]).map(([key, value]) => {
+    const list = (Object.entries(aggregatedData[part]).map(([key, value]) => {
       const v = key;
       const n = value?.[measure]?.[aggregateName] || 0;
       return [v, n];
-    }) as Array<[string, number]>;
+    }) as Array<[string, number]>).sort((a, b) => {
+      return Number(a[0]) - Number(b[0]);
+    });
+    if (list.length === 0) return [];
+    let lastIndex = Number(list[0][0]);
+    const results: Array<[string, number]> = [];
+    list.forEach(([idx, value]) => {
+      const i = Number(idx);
+      while (lastIndex + 1 < i) {
+        lastIndex++;
+        results.push([String(lastIndex), 0]);
+      }
+      results.push([idx, value]);
+      lastIndex = i;
+    });
+    return results;
   };
 
   return {
