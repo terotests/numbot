@@ -6,6 +6,15 @@
 
 import { exampleRules, Parser } from "./parsers";
 
+export type ParseResultLine = {
+  day: Date;
+  result: {
+    text?: string[];
+    number?: string;
+    [key: string]: string | string[] | undefined;
+  };
+};
+
 const createNewDay = (pvm?: Date) => {
   if (pvm) return pvm;
   const day = new Date();
@@ -21,14 +30,7 @@ export function parseLine(
   rules: Parser,
   input: string,
   pvm?: Date
-): {
-  day: Date;
-  result: {
-    text?: string[];
-    number?: string;
-    [key: string]: string | string[] | undefined;
-  };
-} {
+): ParseResultLine {
   let result: any = {};
   const stringToTest = input.trim();
   let testableString = stringToTest;

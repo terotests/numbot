@@ -1,6 +1,8 @@
 import { expect } from "chai";
-import { parser } from "../src/index";
+import { parser, stats } from "../src/index";
 import { exampleRules } from "../src/parsers";
+
+var babar = require("babar");
 
 describe("Options tests", () => {
   it("Test basic date parsing", () => {
@@ -212,5 +214,58 @@ describe("Options tests", () => {
         expect(row.result?.text?.[0]).to.eq("juoksu");
       }
     });
+  });
+
+  it("Test reading statistics", () => {
+    const test = parser(
+      `
+  viikko 1
+    ma juoksu 60min
+    ti juoksu 30min    
+    ke kävely 50min
+  viikko 2
+    ma juoksu 15min
+    ti juoksu 30min    
+    ke sali 40min
+  viikko 3
+    ma juoksu 44min
+    ti juoksu 44min
+    to juoksu 44min
+  viikko 4
+    ma juoksu 34min
+    ti juoksu 74min
+    to juoksu 14min
+  viikko 5
+    ma juoksu 44min
+    ti juoksu 34min
+    to juoksu 14min
+
+
+    `,
+      exampleRules,
+      new Date("2022-01-30")
+    );
+    const statistics = stats(test, "juoksu", "duration_mins");
+    console.log(
+      babar(statistics.week.sum, {
+        caption: "weekly sum",
+        color: "green",
+        width: 40,
+        height: 10,
+        minY: 0.01,
+        yFractions: 1,
+      })
+    );
+
+    console.log(
+      babar(statistics.week.avg, {
+        caption: "weekly average",
+        color: "green",
+        width: 40,
+        height: 10,
+        minY: 0.01,
+        yFractions: 1,
+      })
+    );
   });
 });
