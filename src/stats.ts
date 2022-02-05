@@ -2,6 +2,9 @@ import * as aegg from "aegg";
 import * as dfns from "date-fns";
 import { ParseResultLine } from "./kernel";
 
+// dfns.isWithinInterval()
+// start, end
+
 type Aggregates = {
   count: Array<[string, number]>;
   avg: Array<[string, number]>;
@@ -23,75 +26,89 @@ function computeStats(vals: number[]) {
 }
 
 type StatsResult = {
+  day: Aggregates;
   week: Aggregates;
   month: Aggregates;
+  year: Aggregates;
+  [key: string]: Aggregates;
 };
 
 export function getStatsFor(
   lines: ParseResultLine[],
-  subject: string,
-  measure: string
+  options: {
+    subject?: string | string[];
+    measure: string;
+    format?: string;
+  }
 ): StatsResult {
-  const data = lines
-    .filter((value) => {
-      return (
-        value.result.text?.includes(subject) &&
-        Object.keys(value.result).includes(measure)
-      );
-    })
-    .map((row) => {
-      return {
-        day: row.day,
-        [measure]: Number(row.result[measure]),
-      };
+  const { subject, measure, format } = options;
+
+  const filterValues = (lines: ParseResultLine[]) => {
+    if (!subject) return lines;
+    return lines.filter((value) => {
+      const { subject, measure } = options;
+      if (!subject) return true;
+      const resultKeys = Object.keys(value.result);
+      const subjectMatch =
+        typeof subject === "string"
+          ? value.result.text?.includes(subject)
+          : subject.some((v) => value.result.text?.includes(v));
+      const measureMatch = resultKeys.includes(measure);
+      return subjectMatch && measureMatch;
     });
+  };
+
+  const data = filterValues(lines).map((row) => {
+    return {
+      day: row.day,
+      [options.measure]: Number(row.result[options.measure]),
+    };
+  });
+
+  // collect values for each of the intervals
+  const aggregateObject: {
+    [key: string]: (t: { [key: string]: number | Date }) => string;
+  } = {
+    day: (t) => `${dfns.startOfDay(t.day)}`,
+    week: (t) => `${dfns.startOfISOWeek(t.day)}`,
+    month: (t) => `${dfns.startOfMonth(t.day)}`,
+    year: (t) => `${dfns.startOfYear(t.day)}`,
+  };
+
+  if (format) {
+    aggregateObject[format] = (t) => `${dfns.format(t.day, format)}`;
+  }
 
   const aggregatedData = aegg.multiAggregate(
     data,
-    {
-      week: (t) => `${dfns.getISOWeek(t.day)}`,
-      month: (t) => `${dfns.getMonth(t.day) + 1}`,
-    },
+    aggregateObject,
     computeStats
   );
 
   const collect = (part: string, aggregateName: AggregateKey) => {
-    const list = (Object.entries(aggregatedData[part]).map(([key, value]) => {
+    return (Object.entries(aggregatedData[part]).map(([key, value]) => {
       const v = key;
       const n = value?.[measure]?.[aggregateName] || 0;
       return [v, n];
-    }) as Array<[string, number]>).sort((a, b) => {
-      return Number(a[0]) - Number(b[0]);
-    });
-    if (list.length === 0) return [];
-    let lastIndex = Number(list[0][0]);
-    const results: Array<[string, number]> = [];
-    list.forEach(([idx, value]) => {
-      const i = Number(idx);
-      while (lastIndex + 1 < i) {
-        lastIndex++;
-        results.push([String(lastIndex), 0]);
-      }
-      results.push([idx, value]);
-      lastIndex = i;
-    });
-    return results;
+    }) as Array<[string, number]>)
+      .sort((a, b) => {
+        return a[0].localeCompare(b[0]);
+      })
+      .map(([key, value], idx) => {
+        return [idx, value, key];
+      });
   };
 
   return {
-    week: {
-      min: collect("week", "min"),
-      max: collect("week", "max"),
-      avg: collect("week", "avg"),
-      sum: collect("week", "sum"),
-      count: collect("week", "count"),
-    },
-    month: {
-      min: collect("month", "min"),
-      max: collect("month", "max"),
-      avg: collect("month", "avg"),
-      sum: collect("month", "sum"),
-      count: collect("month", "count"),
-    },
+    ...Object.keys(aggregateObject).reduce((obj: any, key) => {
+      obj[key] = {
+        min: collect(key, "min"),
+        max: collect(key, "max"),
+        avg: collect(key, "avg"),
+        sum: collect(key, "sum"),
+        count: collect(key, "count"),
+      };
+      return obj;
+    }, {}),
   };
 }
