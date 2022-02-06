@@ -1,8 +1,15 @@
 import { expect } from "chai";
 import { parser, stats } from "../src/index";
 import { exampleRules } from "../src/parsers";
+import { StatsResult } from "../src/stats";
 
 var babar = require("babar");
+
+const toBabar = (list: [Date, number][], options: any) =>
+  babar(
+    list.map(([key, value], idx) => [idx, value]),
+    options
+  );
 
 const testLogOneYear = `
 viikko 1
@@ -97,7 +104,7 @@ describe("Statistics tests", () => {
       measure: "duration_mins",
     });
     console.log(
-      babar(statistics.week.sum, {
+      toBabar(statistics.week.sum, {
         caption: "running weekly sum",
         color: "green",
         width: 40,
@@ -110,7 +117,7 @@ describe("Statistics tests", () => {
     expect(statistics.week.sum[1][1]).to.eq(45);
 
     console.log(
-      babar(statistics.week.avg, {
+      toBabar(statistics.week.avg, {
         caption: "running weekly average",
         color: "green",
         width: 40,
@@ -127,7 +134,7 @@ describe("Statistics tests", () => {
       measure: "duration_mins",
     });
     console.log(
-      babar(walk_stats.week.sum, {
+      toBabar(walk_stats.week.sum, {
         caption: "walking weekly sum",
         color: "blue",
         width: 40,
@@ -145,7 +152,7 @@ describe("Statistics tests", () => {
       measure: "duration_mins",
     });
     console.log(
-      babar(statistics.week.sum, {
+      toBabar(statistics.week.sum, {
         caption: "running and walking combined weekly sum",
         color: "green",
         width: 40,
@@ -165,7 +172,7 @@ describe("Statistics tests", () => {
       measure: "duration_mins",
     });
     console.log(
-      babar(statistics.week.sum, {
+      toBabar(statistics.week.sum, {
         caption: "running and walking combined weekly sum for multiple years",
         color: "green",
         width: 40,
@@ -175,7 +182,7 @@ describe("Statistics tests", () => {
       })
     );
     console.log(
-      babar(statistics.day.sum, {
+      toBabar(statistics.day.sum, {
         caption: "sums for each day",
         color: "green",
         width: 40,

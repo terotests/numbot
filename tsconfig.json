@@ -1,6 +1,6 @@
 {
   "includes": ["src/**/*.ts"],
-  "exclude": ["tests/", "node_modules/", "dist/"],
+  "exclude": ["tests/", "node_modules/", "dist/", "examples/"],
   "compilerOptions": {
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */

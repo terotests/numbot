@@ -12,7 +12,17 @@ type Aggregates = {
   min: Array<[string, number]>;
   max: Array<[string, number]>;
 };
-type AggregateKey = keyof Aggregates;
+
+type AggregatesResult = {
+  count: Array<[Date, number]>;
+  avg: Array<[Date, number]>;
+  sum: Array<[Date, number]>;
+  min: Array<[Date, number]>;
+  max: Array<[Date, number]>;
+};
+
+export type AggregateKey = keyof Aggregates;
+export type StatsRows = keyof AggregatesResult;
 
 function computeStats(vals: number[]) {
   const sum = vals.reduce((s, a) => s + a);
@@ -25,12 +35,12 @@ function computeStats(vals: number[]) {
   };
 }
 
-type StatsResult = {
-  day: Aggregates;
-  week: Aggregates;
-  month: Aggregates;
-  year: Aggregates;
-  [key: string]: Aggregates;
+export type StatsResult = {
+  day: AggregatesResult;
+  week: AggregatesResult;
+  month: AggregatesResult;
+  year: AggregatesResult;
+  [key: string]: AggregatesResult;
 };
 
 export function getStatsFor(
@@ -89,13 +99,13 @@ export function getStatsFor(
     return (Object.entries(aggregatedData[part]).map(([key, value]) => {
       const v = key;
       const n = value?.[measure]?.[aggregateName] || 0;
-      return [v, n];
-    }) as Array<[string, number]>)
+      return [new Date(v), n];
+    }) as Array<[Date, number]>)
       .sort((a, b) => {
-        return a[0].localeCompare(b[0]);
+        return a[0].getTime() - b[0].getTime();
       })
       .map(([key, value], idx) => {
-        return [idx, value, key];
+        return [key, value];
       });
   };
 

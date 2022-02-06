@@ -104,9 +104,9 @@ function App() {
             height={320}
             data={
               stats
-                ? stats.week.sum.map((values: any) => {
+                ? stats.week.sum.map((values) => {
                     // TODO: fix the typing in the stats function return value
-                    const date = new Date(values[2]);
+                    const date = new Date(values[0]);
                     return {
                       value: values[1],
                       name: `${dfns.getYear(date)}/${dfns.getISOWeek(date)}`,

@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "date-fns": "^2.28.0",
-    "numbot": "^1.0.6",
+    "numbot": "^1.0.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "recharts": "^2.1.8"
