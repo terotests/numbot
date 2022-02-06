@@ -1,0 +1,25 @@
+.container {
+  margin: 20px;
+}
+.log {
+  width: 400px;
+  height: 400px;
+}
+.inputrow {
+  display: flex;
+}
+
+input,
+textarea {
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+pre {
+  background-color: #eee;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #aaa;
+  margin-top: 20px;
+}
