@@ -125,7 +125,12 @@ function App() {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Legend />
+            <Legend
+              wrapperStyle={{
+                position: "relative",
+                marginTop: "-10px",
+              }}
+            />
             <Bar dataKey="value" fill="#8884d8" />
           </BarChart>
         </div>
