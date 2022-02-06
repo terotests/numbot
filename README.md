@@ -1,5 +1,7 @@
 # Parser for text based logs
 
+NOTE: the API is still a bit unstable, testing for best ways to parse data effiently still.
+
 This is a configurable parser for text based logs. For example
 
 ```
