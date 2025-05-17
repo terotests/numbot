@@ -96,7 +96,7 @@ export const exampleRules: Parser = {
       year: (y, v) => dfns.setYear(y, Number(v)),
     },
     {
-      day: (y, v) => dfns.setDay(y, Number(v)),
+      day: (y, v) => dfns.setDate(y, Number(v)),
     },
     {
       month: (y, v) => dfns.setMonth(y, Number(v) - 1),
